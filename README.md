@@ -177,7 +177,7 @@ Now we will use anvi'o to get functional and taxonomic information, and microbia
 
     Now we will incrporate the information gotten from anvi'o with other data levels, including the metatranscriptome. 
 
-    The extra data can be found in the integration folder [folder](https://www.holofooddata.org/).
+    The extra data can be found in the integration folder [folder](https://github.com/JacobAgerbo/MSMM_2024/tree/main/Integration).
 
     Anvi'o offers advanced features for in-depth metagenomic analysis, including:
     - **Functional Annotation:** Annotate genes within MAGs to understand their functions.
