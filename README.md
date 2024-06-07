@@ -11,7 +11,7 @@ For more information and detailed documentation, refer to the [Anvi'o documentat
 ## Data Preparation
 Before running Anvi'o, make sure you have the necessary metagenomic data ready. In our case, we use an EU-based data portal for multi omics analysis of host-microbe interactions in domesticated chicken and Atlantic salmon. This portal includes raw sequencing reads, assembly files, and any other relevant data for your analysis.
 
-For more information and detailed documentation, refer to the [Data portal](https://www.holofooddata.org/).
+For more information and detailed documentation, refer to the [HoloFood Data portal](https://www.holofooddata.org/).
 
 From the portal we can get ENA accessions and MAGs. Now lets download samples and the MAGs.
 
@@ -58,7 +58,10 @@ Now we will use anvi'o to get functional and taxonomic information, and microbia
 
     # KEGG koFAM
     anvi-setup-kegg-data
-    anvi-run-kegg-kofams -c CONTIGS.db
+    anvi-run-kegg-kofams -c CONTIGS.db 
+
+    # Annotation of marker genes with HMMs
+    anvi-run-hmms -c CONTIGS.db
     ```
 
     ### Make profile database
@@ -76,7 +79,7 @@ Now we will use anvi'o to get functional and taxonomic information, and microbia
     done
     ```
 
-    Now we can map our sample files to the MAG catalogue. 
+    Now we can map our samples to the MAG catalogue, using an old school loop. :yum:
 
     ```bash    
     mapfile -t FILES < SAMPLES.txt
@@ -118,20 +121,71 @@ Now we will use anvi'o to get functional and taxonomic information, and microbia
 
     Now all single profiles has been made and we only need to merge them. :neckbeard:
 
-3. **Import MAGs from collections:** Use Anvi'o's binning tools to group contigs into metagenome-assembled genomes (MAGs).
-4. **Summarize Data:** Explore and visualize the genomic and metabolic information using Anvi'o's interactive interface.
-5. **Analyze and Interpret Results:** Analyze the MAGs to gain insights into the microbial community structure and function.
+    Which is an easy-peasy-one-liner. 
 
-## Advanced Analysis
-Anvi'o offers advanced features for in-depth metagenomic analysis, including:
-- **Functional Annotation:** Annotate genes within MAGs to understand their functions.
-- **Comparative Genomics:** Compare multiple MAGs to identify similarities and differences.
-- **Metabolic Pathway Analysis:** Explore metabolic pathways encoded within the MAGs.
+    ```bash
+    anvi-merge -c CONTIGS.db PROFILES/*/PROFILE.db -o MERGED_PROFILES
+    ```
 
-__Happy analyzing with Anvi'o!__
+    3. **Import MAGs from collections:** 
+
+    Now we need to make and add a collection, to include our MAG information across contigs. The MAG information is stored in the header of the contigs, but we need them as splits. Therefore, we do some `anvi` and `awk` magic. 
+
+    ```bash
+    # Get splits and coverages from all contigs in your contig databases.
+    anvi-export-splits-and-coverages -c CONTIGS.db -p MERGED_PROFILES/PROFILE.db
+    # get split name and old mag name in to columns, using awk
+    awk '{split($1, arr, "_"); print $1 "\t" arr[1]}' MERGED_PROFILES/MERGED_PROFILES-COVs.txt > MERGED_PROFILES/COLLECTION.txt
+    ```
+    Now include the collection to our CONTIG.db and PROFILE.db
+
+    ```bash
+    anvi-import-collection -p MERGED_PROFILES/PROFILE.db -c CONTIGS.db MERGED_PROFILES/COLLECTION.txt -C MAGs
+    ```
+
+    4. **Summarize and export Data:** Explore and visualize the genomic and metabolic information using Anvi'o's interactive interface.
+
+    ```bash
+    # Get functional annotations
+    anvi-export-functions -c CONTIGS.db -o FUNCTIONS.txt
+    # get coverage for each gene
+    anvi-export-gene-coverage-and-detection -c CONTIGS.db -p PROFILE.db -O FUNCTIONS
+    ```
+
+    
+    5. **Analyze and Interpret Results:** Analyze the MAGs to gain insights into the microbial community structure and function.
+
+    Now we should be able to see an anvio illustatrin of our MAGs across samples. 
+    ```bash
+    anvi-interactive -c CONTIGS.db -p PROFILE.db -C MAGs
+    ```
+
+    Furthermore, we can add additional sample information, as in this case, we will add fatty acid measurements, and grouping (based on diet).
+    ```bash
+    anvi-import-misc-data view.txt \
+                              -p PROFILE.db \
+                              --target-data-table layers --just-do-it
+    ```
+    
+    
+    ...and here we get all other data related to the MAGs across samples.
+    ```bash
+    anvi-summarize -c CONTIGS.db -p PROFILE.db -C MAGs
+    ``` 
+
+    ## Advanced Analysis
+
+    Now we will incrporate the information gotten from anvi'o with other data levels, including the metatranscriptome. 
+
+    Anvi'o offers advanced features for in-depth metagenomic analysis, including:
+    - **Functional Annotation:** Annotate genes within MAGs to understand their functions.
+    - **Comparative Genomics:** Compare multiple MAGs to identify similarities and differences.
+    - **Metabolic Pathway Analysis:** Explore metabolic pathways encoded within the MAGs.
+
+    __Happy analyzing with Anvi'o!__
 
 
-```bash
-anvi-gen-genomes-storage -e contigs-db -o genomes-storage.db
-anvi-map -t genomes-storage.db -p PROFILE.db -c CONTIGS.db -o BAM_FILE.bam
-```
+    ```bash
+    anvi-gen-genomes-storage -e contigs-db -o genomes-storage.db
+    anvi-map -t genomes-storage.db -p PROFILE.db -c CONTIGS.db -o BAM_FILE.bam
+    ```
