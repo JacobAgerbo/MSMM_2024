@@ -168,8 +168,11 @@ Now we will use anvi'o to get functional and taxonomic information, and microbia
                               --target-data-table layers --just-do-it
     ```
 
+
     Now we can rerun the `anvi-interactive` code chunk to see additional data layers in anvi'o.    
-    
+
+    ![Metagenomic composition in anvio](.bin/anvio_pic.png)
+
     More importantly, we export all other data related to the MAGs across samples with a simple function, called `anvi-summarize`.
 
     ```bash
