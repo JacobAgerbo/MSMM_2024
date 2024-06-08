@@ -183,6 +183,8 @@ Now we will use anvi'o to get functional and taxonomic information, and microbia
 
     _Happy analyzing with Anvi'o!_
 
+    -----
+
     ## Integrative Analysis in R based on anvi'o outputs.
 
     ### Getting started with R
@@ -532,3 +534,43 @@ Now we will use anvi'o to get functional and taxonomic information, and microbia
     ***Okay, if you're completely lost - that okay and understandable (I'm also).*** :sweat:
     
     Luckily, you can find the exported edge - and node list [here](Network/).
+
+    -----
+
+    ## Make interactive network in Gephi or Cytoscape
+
+    Now we need to install gephi, which can be installed from [here](https://gephi.org/users/install/).
+
+    Alternatively, you can use Cytoscape, which can be installed from [here](https://cytoscape.org/).
+
+
+    After downloading and installing Gephi from the official Gephi website, launch the Gephi application on your computer.
+    Importing Edge and Node Tables:
+
+    * Once Gephi is open, navigate to the "Data Laboratory" tab within the application.
+    
+    * Click on the "Import Spreadsheet" button located in the toolbar.
+    * Select the edge table `correlation_network_for_gephi.csv` and node table `nodes_for_gephi.csv` you want to import ([you can find them here](Network/)).
+    * Follow the prompts to map the columns from your CSV files to the appropriate data fields in Gephi.
+    
+    * After mapping the data, proceed to import the edge and node tables into Gephi for network visualization and analysis.
+        *   I normally use ForceAtlas 2 for layout.
+
+        ![gephi layout](.bin/gephi_layout.png)
+
+        *   You can change the appearance of nodes and edges by partition and ranking, respectively.
+
+        ![gephi appearence](.bin/gephi1.png)
+
+        *   Filter out nodes with low topology (connection to other nodes).
+
+        ![gephi filter](.bin/gephi_filters.png)
+
+        * Add label, when hoovering over nodes
+
+        ![gephi labels](.bin/gephi_labels.png)
+
+    Finally we can have a network showing the association between fatty acids, metagenome, and metatrascriptome, using `Preview`panel.
+
+        ![gephi network](.bin/gephi_network.png)
+
