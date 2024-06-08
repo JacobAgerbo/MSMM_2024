@@ -572,5 +572,5 @@ Now we will use anvi'o to get functional and taxonomic information, and microbia
 
     Finally we can have a network showing the association between fatty acids, metagenome, and metatrascriptome, using `Preview`panel.
 
-        ![gephi network](.bin/gephi_network.png)
+    ![gephi network](.bin/gephi_network.png)
 
