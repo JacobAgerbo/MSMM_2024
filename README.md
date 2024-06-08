@@ -173,21 +173,55 @@ Now we will use anvi'o to get functional and taxonomic information, and microbia
     anvi-summarize -c CONTIGS.db -p PROFILE.db -C MAGs
     ``` 
 
-    ## Advanced Analysis
-
-    Now we will incrporate the information gotten from anvi'o with other data levels, including the metatranscriptome. 
-
-    The extra data can be found in the integration folder [folder](https://github.com/JacobAgerbo/MSMM_2024/tree/main/Integration).
-
-    Anvi'o offers advanced features for in-depth metagenomic analysis, including:
-    - **Functional Annotation:** Annotate genes within MAGs to understand their functions.
-    - **Comparative Genomics:** Compare multiple MAGs to identify similarities and differences.
-    - **Metabolic Pathway Analysis:** Explore metabolic pathways encoded within the MAGs.
+    A finalised repository with databases and summaries can be on [figshare](https://10.6084/m9.figshare.25997383).
 
     __Happy analyzing with Anvi'o!__
 
+    ## Integrative Analysis in R based on anvi'o outputs.
 
-    ```bash
-    anvi-gen-genomes-storage -e contigs-db -o genomes-storage.db
-    anvi-map -t genomes-storage.db -p PROFILE.db -c CONTIGS.db -o BAM_FILE.bam
+    Now we will incrporate the information gotten from anvi'o with the metatranscriptome and fatty acid profiles. 
+
+    The extra data can be found in the integration folder [folder](https://github.com/JacobAgerbo/MSMM_2024/tree/main/Integration)
+
+    We will be using tidyverse in Rstudio. If R and Rstudio is not installed, be please install that using following [link](https://www.stat.colostate.edu/~jah/talks_public_html/isec2020/installRStudio.html).
+    
+    Lets install needed libraries.
+    ```r
+    # List of required libraries
+    libs <- c("tidyverse", "readxl", "ggpubr", "Hmisc")
+
+    # Check if each library is installed, and install it quietly if not
+    for (lib in libs) {
+    if (!requireNamespace(lib, quietly = TRUE)) {
+        install.packages(lib)}
+    }
+
+    # Load the required libraries
+    library(tidyverse)
+    library(readxl)
+    library(ggpubr)
+    library(Hmisc)
     ```
+
+    So in this data, we have given some salmon blue mussels (either 0 % or 13.1 %). Lets see how this affect their fatty acid composition. The fatty composition will be our phenotype in this analysis.
+
+    ```r
+    FA <- read_excel("Fatty_Acids.xlsx")
+    FA %>%
+    mutate(Treatment = as.factor(Treatment)) %>%
+    select(Treatment, contains("%")) %>%
+    reshape2::melt() %>%
+    ggboxplot(x = "Treatment",
+                y = "value",
+                fill = "Treatment") +
+    facet_wrap(~variable, scales = "free_y") +
+    stat_compare_means(label.x = 1.5, label = "p.signif") +
+    scale_fill_manual(values = c("#eb4034", "#28478f")) +
+    theme(legend.position = "none") +
+    ylab("Sum-Normalised Abundace")
+    ```
+    ![Fatty Acid Composition](.bin/Fatty_Acids.png)
+
+    As you might see, the diet seems to affect the composition of SFAs, MUFAs, and PUFAs.
+
+    
